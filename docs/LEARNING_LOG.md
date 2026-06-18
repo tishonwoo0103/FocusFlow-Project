@@ -44,3 +44,13 @@
 - Added GitHub collaboration notes for working with Mia.
 - Added Vercel readiness notes and kept local Vercel project links private.
 - Shifted the schedule to run from June 21 through August 25, 2026 and added safe local storage migration.
+
+## 2026-06-17
+
+- Confirmed the first successful GitHub + Vercel production deployment for FocusFlow V3.0.
+- Verified the latest Vercel production deployment is `READY`.
+- Ran deployment-readiness checks: `npm install`, `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build`.
+- Updated project docs so Mia collaboration can start from the deployed baseline.
+- Added FocusFlow V3.5 Collaborator Mode for Tishon and Mia.
+- Added collaborator owner, review status, branch, handoff, check-in, and checklist tracking.
+- Moved local storage to `focusflow:v8:*` with fallback migration from earlier FocusFlow keys.

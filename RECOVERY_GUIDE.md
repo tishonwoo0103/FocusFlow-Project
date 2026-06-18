@@ -83,9 +83,12 @@ Also verify these routes in the browser:
 - Dashboard
 - Today
 - Calendar Tasks
+- Collaborator Mode
 - Wix Learning Center
 - Research Hub
 - Website Planning
+
+For Collaborator Mode changes, confirm local storage can read older `focusflow:v7:*` data and write the new `focusflow:v8:*` collaborator board without a runtime crash.
 
 ## GitHub Safety Rules
 
@@ -145,5 +148,7 @@ Current Vercel project:
 
 - Name: `focus-flow-project`
 - Project ID: `prj_SMuzxjBz5WJ5YpidNKffOT2acKHs`
-- Current deployments at setup audit: 0
+- Production deployment status: operational
+- Latest production deployment state: `READY`
+- Latest deployment URL: `https://focus-flow-project-6szvrvmee-tishonwoo0103-1084s-projects.vercel.app`
 - Local `.vercel/project.json` may link this folder to the project, but `.vercel/` stays ignored.

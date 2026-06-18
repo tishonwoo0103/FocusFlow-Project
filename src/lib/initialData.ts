@@ -1,4 +1,5 @@
 import type {
+  CollaborationBoard,
   CurriculumStage,
   ProjectStatus,
   ResearchDomain,
@@ -304,3 +305,49 @@ export const getDefaultWixDevelopmentItems = (): WixDevelopmentItem[] => [
     completion: 0
   }
 ];
+
+export const getDefaultCollaborationBoard = (): CollaborationBoard => ({
+  sharedGoal: "Prepare the FocusFlow V3.5 collaborator workflow so Tishon and Mia can build from the same plan.",
+  nextCheckIn: "Review one finished change before merging to main.",
+  githubBranch: "feature/mia-collaboration",
+  handoffNote: "Leave a short note about what changed, what needs review, and what should happen next.",
+  reviewFocus: "Keep main deployable, make one focused change per branch, and run checks before merging.",
+  items: [
+    {
+      id: "collab-wix-learning-links",
+      title: "Add Wix learning resource links.",
+      area: "Wix Learning",
+      owner: "Mia",
+      status: "Next Up",
+      reviewState: "Draft",
+      githubBranch: "feature/mia-wix-learning-links",
+      handoffNote: "Add beginner-friendly Wix links for Basics, Pages, Forms, CMS, and Dashboards.",
+      checkInNote: "Confirm every link helps the current FocusFlow build stage.",
+      checklist: checklist("collab-wix-learning-links", ["Collect links", "Add resource labels", "Review links with Tishon"])
+    },
+    {
+      id: "collab-evidence-library",
+      title: "Fill first evidence summaries.",
+      area: "Evidence Library",
+      owner: "Both",
+      status: "In Progress",
+      reviewState: "Needs Review",
+      githubBranch: "feature/focusflow-evidence-sources",
+      handoffNote: "Start with Digital Habits and Sleep so the website claims have support.",
+      checkInNote: "Check whether each summary clearly says what the evidence establishes.",
+      checklist: checklist("collab-evidence-library", ["Choose sources", "Write summaries", "Connect findings to FocusFlow"])
+    },
+    {
+      id: "collab-homepage-copy",
+      title: "Review public homepage copy.",
+      area: "Wix Development",
+      owner: "Tishon",
+      status: "Next Up",
+      reviewState: "Draft",
+      githubBranch: "feature/homepage-copy-review",
+      handoffNote: "Make the homepage clear for students, parents, and school adults.",
+      checkInNote: "Ask Mia to flag unclear wording before the Wix build.",
+      checklist: checklist("collab-homepage-copy", ["Draft message", "Review clarity", "Prepare Wix copy"])
+    }
+  ]
+});

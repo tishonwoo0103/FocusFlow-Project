@@ -65,3 +65,15 @@ Reason: The schedule dates changed, but completed seeded tasks should keep their
 Decision: Document Vercel readiness without committing `.vercel/` project-link files.
 
 Reason: Vercel project links can contain local account/project metadata. The safer workflow is to import the GitHub repo in Vercel after the stable checkpoint is pushed.
+
+## 2026-06-17: Use GitHub And Vercel As The Stable Collaboration Baseline
+
+Decision: Treat the GitHub `main` branch and Vercel production deployment as the FocusFlow V3.0 baseline, while Mia collaboration work happens in focused feature branches.
+
+Reason: The project now has a working production deployment, so future changes should protect `main` and keep deployment recovery simple.
+
+## 2026-06-17: Keep Collaborator Mode Local
+
+Decision: Build V3.5 Collaborator Mode as local storage planning data with fixed collaboration work items, owner fields, review states, branch notes, handoff notes, check-in notes, and checklists.
+
+Reason: Tishon and Mia need a simple shared workflow for deciding who does what next. Real accounts, live sync, permissions, and GitHub automation would add complexity before the project needs it.

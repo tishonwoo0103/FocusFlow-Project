@@ -1,4 +1,5 @@
-import { ArrowDown, ArrowRight, Crosshair, Target } from "lucide-react";
+import Link from "next/link";
+import { ArrowDown, ArrowRight, Crosshair, GitBranch, Target, Users } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
@@ -88,10 +89,12 @@ function RoadmapTimeline({
 }
 
 export default function DashboardPage() {
-  const { projectStatus, setProjectStatus, tasks, setTasks } = useOperatingSystemState();
+  const { collaborationBoard, projectStatus, setProjectStatus, tasks, setTasks } = useOperatingSystemState();
   const activeStage = getActiveBuildStage();
   const progress = getSummerTaskProgress(tasks);
   const upcomingTaskGroups = groupTasksByDate(getUpcomingTasks(tasks));
+  const miaItems = collaborationBoard.items.filter((item) => item.owner === "Mia" || item.owner === "Both");
+  const activeMiaItems = miaItems.filter((item) => item.status !== "Completed");
 
   return (
     <Layout title="Dashboard">
@@ -103,6 +106,41 @@ export default function DashboardPage() {
         completedTasks={progress.completedTasks}
         totalTasks={progress.totalTasks}
       />
+
+      <section className="surface mt-6 p-5">
+        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <div className="flex items-center gap-2 text-sm font-semibold text-brand-700">
+              <Users aria-hidden="true" className="h-4 w-4" />
+              Collaborator Mode
+            </div>
+            <h2 className="mt-2 text-xl font-bold text-slate-950">Tishon + Mia build lane</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{collaborationBoard.sharedGoal}</p>
+          </div>
+          <div className="grid gap-3 md:grid-cols-3">
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="label">Mia Active Items</div>
+              <div className="mt-2 text-2xl font-bold text-slate-950">{activeMiaItems.length}</div>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="label">Next Check-In</div>
+              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{collaborationBoard.nextCheckIn}</p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+              <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
+                <GitBranch aria-hidden="true" className="h-4 w-4" />
+                Branch
+              </div>
+              <p className="mt-2 break-words text-sm font-semibold leading-6 text-slate-800">{collaborationBoard.githubBranch}</p>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <Link href="/collaborator" className="btn-secondary">
+            Open Collaborator Mode
+          </Link>
+        </div>
+      </section>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <Panel title="Current Build State">

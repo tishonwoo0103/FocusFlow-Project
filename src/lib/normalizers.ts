@@ -1,9 +1,14 @@
 import {
+  collaboratorNames,
   curriculumStatuses,
   resourceTypes,
+  reviewStates,
   taskCategories,
   taskStatuses,
   workspaceStates,
+  type CollaborationBoard,
+  type CollaboratorItem,
+  type CollaboratorName,
   type ChecklistItem,
   type CurriculumStage,
   type CurriculumStatus,
@@ -16,6 +21,7 @@ import {
   type TaskStatus,
   type VibeCodingItem,
   type WixDevelopmentItem,
+  type ReviewState,
   type WorkspaceState
 } from "@/types";
 
@@ -102,6 +108,26 @@ const workspaceStatus = (value: unknown, defaultValue: WorkspaceState): Workspac
 
   if (value === "Doing" || value === "In Progress") {
     return "Building";
+  }
+
+  return defaultValue;
+};
+
+const collaboratorName = (value: unknown, defaultValue: CollaboratorName): CollaboratorName => {
+  return isOneOf(value, collaboratorNames) ? value : defaultValue;
+};
+
+const reviewState = (value: unknown, defaultValue: ReviewState): ReviewState => {
+  if (isOneOf(value, reviewStates)) {
+    return value;
+  }
+
+  if (value === "Review" || value === "Ready For Review") {
+    return "Needs Review";
+  }
+
+  if (value === "Done" || value === "Complete") {
+    return "Reviewed";
   }
 
   return defaultValue;
@@ -347,4 +373,38 @@ export const normalizeWixDevelopmentItems = (value: unknown, defaultValue: WixDe
       completion: percentValue(record.completion ?? record.progress, page.completion)
     };
   });
+};
+
+const normalizeCollaboratorItem = (value: unknown, defaultValue: CollaboratorItem): CollaboratorItem => {
+  const record = isRecord(value) ? value : {};
+
+  return {
+    id: defaultValue.id,
+    title: text(record.title, defaultValue.title),
+    area: text(record.area, defaultValue.area),
+    owner: collaboratorName(record.owner, defaultValue.owner),
+    status: taskStatus(record.status, defaultValue.status),
+    reviewState: reviewState(record.reviewState ?? record.reviewStatus, defaultValue.reviewState),
+    githubBranch: text(record.githubBranch ?? record.branch, defaultValue.githubBranch),
+    handoffNote: text(record.handoffNote ?? record.handoff, defaultValue.handoffNote),
+    checkInNote: text(record.checkInNote ?? record.checkIn, defaultValue.checkInNote),
+    checklist: normalizeChecklist(record.checklist, defaultValue.checklist)
+  };
+};
+
+export const normalizeCollaborationBoard = (value: unknown, defaultValue: CollaborationBoard): CollaborationBoard => {
+  const record = isRecord(value) ? value : {};
+  const itemRecords = savedRecords(record.items);
+
+  return {
+    sharedGoal: text(record.sharedGoal, defaultValue.sharedGoal),
+    nextCheckIn: text(record.nextCheckIn, defaultValue.nextCheckIn),
+    githubBranch: text(record.githubBranch ?? record.branch, defaultValue.githubBranch),
+    handoffNote: text(record.handoffNote ?? record.handoff, defaultValue.handoffNote),
+    reviewFocus: text(record.reviewFocus, defaultValue.reviewFocus),
+    items: defaultValue.items.map((item, index) => {
+      const savedItem = matchByFields(itemRecords, [item.id, item.title]) ?? itemRecords[index];
+      return normalizeCollaboratorItem(savedItem, item);
+    })
+  };
 };

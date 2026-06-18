@@ -1,10 +1,10 @@
 # Current Phase
 
-FocusFlow V3 Stable infrastructure setup
+FocusFlow V3.5 Collaborator Mode
 
 # Project Completion
 
-97%
+100%
 
 # Current Objective
 
@@ -20,25 +20,27 @@ Stage 1: Blueprint
 
 # Latest Update
 
-2026-06-16: Updated the project to a 66-day summer build schedule from 2026-06-21 through 2026-08-25. Added 10 Launch Prep continuation tasks, kept the existing schedule order, added local storage fallback migration from earlier schedule keys, and verified schedule integrity, TypeScript, retired terminology, and migration behavior. Production build and browser verification could not complete in this shell because local `node_modules` file-read failures occurred during CSS/PostCSS processing.
+2026-06-17: Added FocusFlow V3.5 Collaborator Mode for Tishon and Mia. Added a Collaborator page, dashboard summary, local collaborator board state, owner/status/review/branch/handoff/check-in/checklist tracking, and `focusflow:v8:*` storage migration with earlier key fallbacks. Chrome verification passed for Dashboard and Collaborator Mode with no console errors.
 
-2026-06-16: Added GitHub/Vercel infrastructure readiness documentation, confirmed Git is initialized on `main`, confirmed `origin` points to `https://github.com/tishonwoo0103/FocusFlow-Project.git`, confirmed local Vercel link files are ignored, and prepared the FocusFlow V3 Stable release checkpoint. Exact `npm` commands could not run because this shell has no `npm` binary, but direct TypeScript and production build checks passed with bundled Node. GitHub push is waiting on local GitHub authentication. Vercel project `focus-flow-project` exists but has no deployments yet.
+2026-06-16: Updated the project to a 66-day summer build schedule from 2026-06-21 through 2026-08-25. Added 10 Launch Prep continuation tasks, kept the existing schedule order, added local storage fallback migration from earlier schedule keys, and verified schedule integrity, TypeScript, retired terminology, and migration behavior.
+
+2026-06-16: Added GitHub/Vercel infrastructure readiness documentation, confirmed Git is initialized on `main`, confirmed `origin` points to `https://github.com/tishonwoo0103/FocusFlow-Project.git`, confirmed local Vercel link files are ignored, and prepared the FocusFlow V3 Stable release checkpoint.
+
+2026-06-17: Created the FocusFlow V3.0 deployment checkpoint after the first successful GitHub + Vercel production deployment. Verified the latest Vercel production deployment is `READY` for GitHub commit `512b96117d95535d2661791a947158f77f4ba679`. Ran `npm install`, `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build` successfully with the bundled Node runtime.
 
 # Open Items
 
 - Add real evidence notes and source summaries.
 - Add real Wix learning resource links.
-- Run the added npm scripts on a machine with system `npm` available.
-- Authenticate GitHub locally, then push the FocusFlow V3 Stable checkpoint.
+- Use Collaborator Mode to assign Mia's next focused work item.
+- Create a focused Mia collaboration branch for the next content or research update.
 - Begin the June 21 Blueprint task.
-- Trigger the first Vercel deployment after GitHub receives the stable checkpoint.
 
 # Risks
 
-- Older browser data can migrate from earlier storage keys because V3 now uses `focusflow:v7:*` with `v6` and `v5` fallbacks.
+- Older browser data can migrate from earlier storage keys because V3.5 now uses `focusflow:v8:*` with `v7`, `v6`, and `v5` fallbacks.
 - Exact `npm` commands need a shell where `npm` is available on `PATH`; bundled Node checks are used in this workspace.
-- Next build cannot complete in this shell because local dependency file-read failures occur in `node_modules`; a clean `npm install` should be run in an environment with `npm` available.
-- Remote GitHub push should wait for user confirmation.
-- Vercel deployment is structurally ready, but no local Vercel project link exists yet.
-- Vercel project `focus-flow-project` exists, but it is not live and has zero deployments.
+- `npm install` reports 2 dependency audit findings, 1 moderate and 1 high. Review dependency impact before using `npm audit fix --force`.
+- Future collaborator changes should use feature branches so `main` remains deployable.
 - Local `.vercel/project.json` may exist but is ignored by Git.
+- Collaborator Mode is local-only and does not provide live multi-user sync.

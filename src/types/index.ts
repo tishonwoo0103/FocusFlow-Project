@@ -17,12 +17,16 @@ export const taskStatuses = ["Next Up", "In Progress", "Completed"] as const;
 export const curriculumStatuses = ["Not Started", "Learning", "Practicing", "Complete"] as const;
 export const resourceTypes = ["YouTube", "Documentation", "Article"] as const;
 export const workspaceStates = ["Planned", "Drafting", "Building", "Review", "Ready"] as const;
+export const collaboratorNames = ["Tishon", "Mia", "Both"] as const;
+export const reviewStates = ["Draft", "Needs Review", "Reviewed"] as const;
 
 export type TaskCategory = (typeof taskCategories)[number];
 export type TaskStatus = (typeof taskStatuses)[number];
 export type CurriculumStatus = (typeof curriculumStatuses)[number];
 export type ResourceType = (typeof resourceTypes)[number];
 export type WorkspaceState = (typeof workspaceStates)[number];
+export type CollaboratorName = (typeof collaboratorNames)[number];
+export type ReviewState = (typeof reviewStates)[number];
 
 export type ProjectStatus = {
   currentObjective: string;
@@ -114,4 +118,26 @@ export type WixDevelopmentItem = {
   notes: string;
   checklist: ChecklistItem[];
   completion: number;
+};
+
+export type CollaboratorItem = {
+  id: string;
+  title: string;
+  area: string;
+  owner: CollaboratorName;
+  status: TaskStatus;
+  reviewState: ReviewState;
+  githubBranch: string;
+  handoffNote: string;
+  checkInNote: string;
+  checklist: ChecklistItem[];
+};
+
+export type CollaborationBoard = {
+  sharedGoal: string;
+  nextCheckIn: string;
+  githubBranch: string;
+  handoffNote: string;
+  reviewFocus: string;
+  items: CollaboratorItem[];
 };

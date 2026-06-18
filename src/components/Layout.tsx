@@ -10,7 +10,8 @@ import {
   LayoutDashboard,
   LucideIcon,
   Microscope,
-  PanelsTopLeft
+  PanelsTopLeft,
+  Users
 } from "lucide-react";
 
 type NavItem = {
@@ -24,6 +25,7 @@ const navItems: NavItem[] = [
   { href: "/today", label: "Today", icon: CalendarCheck },
   { href: "/tasks", label: "Calendar", icon: CalendarDays },
   { href: "/website", label: "Website Planning", icon: PanelsTopLeft },
+  { href: "/collaborator", label: "Collaborator", icon: Users },
   { href: "/wix", label: "Wix Learning", icon: BookOpen },
   { href: "/research", label: "Evidence", icon: Microscope },
   { href: "/vibe-coding", label: "Vibe Coding", icon: Code2 },

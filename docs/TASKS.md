@@ -4,9 +4,9 @@
 - Add real Wix learning resource links.
 - Start the June 21 Blueprint task.
 - Use the Calendar page to complete each V3 daily task.
-- Run npm scripts on a machine with system `npm` available.
-- Authenticate GitHub locally and push the FocusFlow V3 Stable checkpoint.
-- Trigger the first Vercel deployment for `focus-flow-project` after GitHub has the stable checkpoint.
+- Use Collaborator Mode to choose Mia's next focused work item.
+- Create a focused Mia collaboration branch for the next content or research update.
+- Keep `main` deployable by running checks before each merge.
 
 # In Progress
 
@@ -57,4 +57,9 @@ None
 - Added GitHub collaboration workflow for Mia.
 - Added Vercel deployment readiness documentation.
 - Prepared the FocusFlow V3 Stable release checkpoint.
-- Inspected Vercel and found `focus-flow-project` with zero deployments.
+- Completed the first successful GitHub + Vercel production deployment.
+- Verified the latest Vercel production deployment is `READY`.
+- Passed `npm install`, `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build` with the bundled Node runtime.
+- Added FocusFlow V3.5 Collaborator Mode.
+- Added collaborator navigation and dashboard summary.
+- Added collaborator board local storage with `focusflow:v8:*` migration.
