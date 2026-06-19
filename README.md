@@ -2,121 +2,104 @@
 
 Project Building Space for planning and building the FocusFlow student project.
 
-## Current Stable Version
+## Current Version
 
-FocusFlow V3.5 is the current release checkpoint.
+FocusFlow V4 moves the shared team task system from browser-only storage to Vercel API routes backed by Upstash Redis.
 
-- 66-day summer build schedule
-- 8 roadmap stages from Blueprint to Launch Prep
-- Calendar-based daily tasks from 2026-06-21 through 2026-08-25
-- Collaborator Mode for Tishon and Mia
-- Local browser storage with `focusflow:v8:*` keys and fallback migration from earlier FocusFlow keys
-- No backend, authentication, database, or AI integration
-- First successful GitHub + Vercel production deployment is operational
+- One shared task list for Tishon and Mia
+- Two independent completion checkboxes on every task
+- Server-derived `Next Up`, `In Progress`, and `Completed` states
+- Shared task creation, editing, deletion, and activity
+- Five-second polling plus refresh on window focus
+- Idempotent import of the 66-day V3 schedule and supported legacy browser tasks
+- No login, passwords, task ownership, roles, or personal task lists
+
+The other FocusFlow workspaces continue to use the existing lightweight browser storage model.
 
 ## Stack
 
-- Next.js
+- Next.js 14 Pages Router
 - TypeScript
 - Tailwind CSS
-- Local storage persistence
+- Upstash Redis through server-only Next.js API routes
+- Vercel deployment from GitHub
 
-## Run Locally
+## Shared Storage Setup
 
-```bash
-npm install
-npm run dev
+1. Open the FocusFlow project in Vercel.
+2. Open **Storage** or **Marketplace**.
+3. Add an Upstash Redis integration and connect it to FocusFlow.
+4. Confirm these variables exist in the **Preview** environment:
+
+```text
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
 ```
 
-Open `http://localhost:3000`.
+5. Redeploy the `dev` preview after adding the variables.
+6. Open the preview as Tishon and select **Import Local Tasks** once.
+7. Wait for that import to finish before Mia starts using the shared task system.
+
+For a local shell only, create `.env.local` from `.env.example` and add the real values. Never commit `.env.local` or either secret.
+
+## Migration
+
+The one-time import sends legacy task data from supported `focusflow:v5:tasks` through `focusflow:v8:tasks` keys to `/api/shared/bootstrap`.
+
+- The server always includes the repository's 66-day schedule.
+- Matching schedule tasks use stable current IDs and dates.
+- Legacy `Completed` tasks become completed by both collaborators.
+- Other legacy tasks start unchecked for both collaborators.
+- Repeated bootstrap requests return safely without overwriting remote data.
+- Empty browser storage never deletes or replaces existing shared tasks.
+
+After migration, tasks, completion state, edits, and activity use Redis only. Local storage remains allowed for the `Updating as` device preference and migration marker.
+
+## API
+
+```text
+GET    /api/shared/tasks
+POST   /api/shared/tasks
+PATCH  /api/shared/tasks/:id
+DELETE /api/shared/tasks/:id
+GET    /api/shared/activity
+POST   /api/shared/bootstrap
+```
+
+Redis keys:
+
+```text
+focusflow:shared:v1:tasks
+focusflow:shared:v1:activity
+focusflow:shared:v1:initialized
+```
+
+The Redis token is read only by server-side API code. Browser code never receives it.
 
 ## Verification
 
-Run these checks before accepting major changes:
+Run before accepting a change:
 
 ```bash
 npm test
 npm run lint
+npm run typecheck
 npm run build
 ```
 
-Then open the main pages: Dashboard, Today, Calendar Tasks, Wix Learning Center, Research Hub, and Website Planning.
+Testing uses the Vercel preview created from `dev`. Verify Dashboard, Today, Calendar, Collaborator Mode, Wix Learning, Evidence, Website Planning, Vibe Coding, and Wix Development. Do not use the production site as a test environment.
 
-For V3.5, also open Collaborator Mode and confirm the owner, review status, branch, handoff, check-in, and checklist controls work.
+For synchronization, open the preview in one normal browser window as Tishon and one private window as Mia. Confirm task creation, editing, each completion checkbox, status changes, activity, polling, and refresh persistence.
 
-## Collaboration Workflow
+## Git Workflow
 
-For working with Mia:
+- GitHub repository: `tishonwoo0103/FocusFlow-Project`
+- Active development branch: `dev`
+- Production branch: `main`
+- Production site: `https://focus-flow-project-jet.vercel.app/`
 
-1. Start from `main`.
-2. Pull the latest GitHub version before changing files.
-3. Create a branch for each focused change.
-4. Run verification before merging.
-5. Keep commits small and named clearly.
+Make changes on `dev`, run checks, push only after approval, and verify the Vercel preview. Never merge `dev` into `main` without explicit approval. Never force push.
 
-```bash
-git switch main
-git pull
-git switch -c feature/mia-short-description
-npm test
-npm run lint
-npm run build
-git status
-```
+## Security Limitation
 
-Suggested branch names:
-
-- `feature/mia-wix-learning-links`
-- `feature/mia-research-sources`
-- `feature/mia-homepage-copy`
-
-## Safety Workflow
-
-Use Git checkpoints before large refactors:
-
-```bash
-git status
-git add .
-git commit -m "Describe the safe checkpoint"
-```
-
-For new work, create a branch first:
-
-```bash
-git switch -c feature/short-description
-```
-
-## GitHub
-
-The local repo is connected to GitHub:
-
-```bash
-https://github.com/tishonwoo0103/FocusFlow-Project.git
-```
-
-Production deployments are sourced from the GitHub `main` branch. Push only after local verification passes:
-
-```bash
-git push -u origin main
-git push origin focusflow-v3-stable
-```
-
-If Git asks for credentials, authenticate GitHub first through GitHub Desktop, the GitHub CLI, or a personal access token.
-
-## Vercel
-
-This is a standard Next.js app deployed on Vercel with:
-
-- Install command: `npm install`
-- Build command: `npm run build`
-- Output: handled automatically by Vercel for Next.js
-- Node: `>=18.17.0`
-
-Current Vercel project:
-
-- Project name: `focus-flow-project`
-- Project ID: `prj_SMuzxjBz5WJ5YpidNKffOT2acKHs`
-- Latest production deployment: `READY`
-- Latest deployment URL: `https://focus-flow-project-6szvrvmee-tishonwoo0103-1084s-projects.vercel.app`
-
-A local `.vercel/project.json` link can exist on this machine, but `.vercel/` stays ignored because it should not be committed.
+Collaborator attribution is trust-based, not authentication. Anyone who can reach the deployed API can submit writes as Tishon or Mia. The Redis secret remains protected, but the API itself is intentionally public-write because V4 does not include accounts or permissions. Add authentication and authorization before sharing the app with an untrusted public audience.

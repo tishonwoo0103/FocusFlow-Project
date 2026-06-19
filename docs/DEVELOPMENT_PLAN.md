@@ -1,6 +1,6 @@
 # Development Plan
 
-## Version 2 Goal
+## Version 4 Goal
 
 Build the smallest useful FocusFlow Project Building Space for planning, learning, evidence collection, and website build work.
 
@@ -9,8 +9,9 @@ Build the smallest useful FocusFlow Project Building Space for planning, learnin
 - Next.js Pages Router for simple page-based navigation
 - TypeScript for readable data shapes
 - Tailwind CSS for lightweight styling
-- Browser local storage for persistence
-- No authentication, backend, database, or AI integration
+- Upstash Redis for shared task and activity persistence through Next.js API routes
+- Browser local storage for non-task planning workspaces and collaborator preference only
+- No authentication, task ownership, roles, or AI integration
 
 ## Feature Workflow
 
@@ -30,11 +31,12 @@ Build the smallest useful FocusFlow Project Building Space for planning, learnin
 - Website Planning Center
 - Vibe Coding Workspace with checklist progress
 - Wix Development Workspace with checklist progress
+- Shared team task API, synchronization, activity, and migration
 
 ## Out Of Scope
 
-- User accounts
-- Cloud sync
+- User accounts and permissions
+- Personal task lists
 - Complex dashboards
 - Automated AI assistants
 - Production deployment

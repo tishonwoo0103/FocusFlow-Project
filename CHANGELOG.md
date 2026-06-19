@@ -1,5 +1,22 @@
 # Changelog
 
+## FocusFlow V4 - 2026-06-19
+
+Implemented truly shared team tasks for Tishon and Mia on the `dev` branch.
+
+- Added server-only Upstash Redis access and shared task, activity, and bootstrap API routes.
+- Added independent Tishon and Mia completion values with server-derived task status.
+- Added atomic task updates that preserve the other collaborator's latest checkbox value.
+- Added shared task polling, focus refresh, retry behavior, and retained last successful data.
+- Restored Calendar task creation and added shared editing and deletion.
+- Replaced the local owner/review collaborator board with trust-based update attribution.
+- Added a shared Dashboard activity feed capped at the latest 100 server records.
+- Added an idempotent migration for the 66-day schedule and supported legacy browser task keys.
+- Added shared-task contract tests for status derivation, migration, validation, schedule preservation, and unavailable-storage behavior.
+- Corrected Upstash response deserialization so Redis hashes return task records keyed by task ID.
+- Documented Vercel Upstash setup, environment variables, migration, and public-write security risk.
+- Kept `main` unchanged and deferred all remote pushes until user approval.
+
 ## FocusFlow V3.5 - 2026-06-17
 
 Added Collaborator Mode for building FocusFlow with Mia.

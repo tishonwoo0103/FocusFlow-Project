@@ -54,3 +54,12 @@
 - Added FocusFlow V3.5 Collaborator Mode for Tishon and Mia.
 - Added collaborator owner, review status, branch, handoff, check-in, and checklist tracking.
 - Moved local storage to `focusflow:v8:*` with fallback migration from earlier FocusFlow keys.
+
+## 2026-06-19
+
+- Replaced browser-only team task state with server-only Upstash Redis access.
+- Used atomic Redis scripts so one collaborator's completion update preserves the other collaborator's latest value.
+- Kept server state visible during temporary refresh failures instead of clearing the interface.
+- Added a non-destructive, idempotent bootstrap for the 66-day schedule and legacy browser tasks.
+- Added focused contract tests and caught an Upstash `HGETALL` deserialization mismatch before preview deployment.
+- Documented that secret protection does not make an unauthenticated write API private.

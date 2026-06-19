@@ -1,200 +1,123 @@
-import { CheckCircle2, Circle, GitBranch, MessageSquare, Users } from "lucide-react";
-import { Badge, statusTone } from "@/components/Badge";
+import { RefreshCw, Users } from "lucide-react";
+import { Badge } from "@/components/Badge";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
-import { useOperatingSystemState } from "@/lib/operatingSystem";
-import { collaboratorNames, reviewStates, taskStatuses, type CollaboratorName, type ReviewState, type TaskStatus } from "@/types";
+import { SharedStorageState } from "@/components/SharedStorageState";
+import { SharedTaskCard } from "@/components/SharedTaskCard";
+import { useSharedTasks } from "@/hooks/useSharedTasks";
+import { sortTasksByDate } from "@/lib/selectors";
+
+const actorLabel = (value: string) => value === "tishon" ? "Tishon" : "Mia";
+
+const activityTime = (value: string) => {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Unknown time";
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+};
 
 export default function CollaboratorPage() {
-  const { collaborationBoard, setCollaborationBoard } = useOperatingSystemState();
-
-  const updateBoard = (patch: Partial<typeof collaborationBoard>) => {
-    setCollaborationBoard((current) => ({ ...current, ...patch }));
-  };
-
-  const updateItem = (itemId: string, patch: Partial<(typeof collaborationBoard.items)[number]>) => {
-    setCollaborationBoard((current) => ({
-      ...current,
-      items: current.items.map((item) => (item.id === itemId ? { ...item, ...patch } : item))
-    }));
-  };
-
-  const toggleChecklist = (itemId: string, checklistId: string) => {
-    setCollaborationBoard((current) => ({
-      ...current,
-      items: current.items.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              checklist: item.checklist.map((entry) => (entry.id === checklistId ? { ...entry, done: !entry.done } : entry))
-            }
-          : item
-      )
-    }));
-  };
-
-  const miaItems = collaborationBoard.items.filter((item) => item.owner === "Mia" || item.owner === "Both");
-  const readyForReview = collaborationBoard.items.filter((item) => item.reviewState === "Needs Review").length;
+  const shared = useSharedTasks();
+  const activeTasks = sortTasksByDate(shared.tasks.filter((task) => task.status !== "Completed")).slice(0, 8);
+  const completedTasks = shared.tasks.filter((task) => task.status === "Completed").length;
 
   return (
     <Layout title="Collaborator Mode">
-      <PageHeader title="Collaborator Mode" eyebrow="FocusFlow V3.5">
+      <PageHeader title="Collaborator Mode" eyebrow="Truly Shared Team Tasks">
         <Badge tone="blue">Tishon + Mia</Badge>
-        <Badge tone="green">Local Only</Badge>
+        <Badge tone="green">Shared</Badge>
       </PageHeader>
 
-      <section className="surface p-5">
+      <SharedStorageState
+        actor={shared.actor}
+        setActor={shared.setActor}
+        error={shared.error}
+        needsBootstrap={shared.needsBootstrap}
+        pendingKeys={shared.pendingKeys}
+        retry={shared.refresh}
+        bootstrap={shared.bootstrap}
+      />
+
+      <section className="surface mt-6 p-5">
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr]">
           <div>
             <div className="flex items-center gap-2 text-sm font-semibold text-brand-700">
               <Users aria-hidden="true" className="h-4 w-4" />
               Shared Build Lane
             </div>
-            <h2 className="mt-2 text-2xl font-bold text-slate-950">FocusFlow V3.5</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{collaborationBoard.sharedGoal}</p>
+            <h2 className="mt-2 text-2xl font-bold text-slate-950">One task list, two completion signals</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Every task belongs to the FocusFlow team. The selector records who made each update; it does not create ownership or permissions.
+            </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="label">Mia Items</div>
-              <div className="mt-2 text-2xl font-bold text-slate-950">{miaItems.length}</div>
+              <div className="label">Shared Tasks</div>
+              <div className="mt-2 text-2xl font-bold text-slate-950">{shared.tasks.length}</div>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="label">Needs Review</div>
-              <div className="mt-2 text-2xl font-bold text-slate-950">{readyForReview}</div>
+              <div className="label">In Progress</div>
+              <div className="mt-2 text-2xl font-bold text-slate-950">{shared.tasks.filter((task) => task.status === "In Progress").length}</div>
             </div>
             <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="label">Default Branch</div>
-              <p className="mt-2 break-words text-sm font-bold text-slate-950">{collaborationBoard.githubBranch}</p>
+              <div className="label">Completed Together</div>
+              <div className="mt-2 text-2xl font-bold text-slate-950">{completedTasks}</div>
             </div>
           </div>
         </div>
       </section>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <Panel title="Collaboration Notes">
-          <div className="grid gap-4">
-            <label className="grid gap-2">
-              <span className="label">Shared Goal</span>
-              <textarea className="textarea" value={collaborationBoard.sharedGoal} onChange={(event) => updateBoard({ sharedGoal: event.target.value })} />
-            </label>
-            <label className="grid gap-2">
-              <span className="label">Next Check-In</span>
-              <input className="input" value={collaborationBoard.nextCheckIn} onChange={(event) => updateBoard({ nextCheckIn: event.target.value })} />
-            </label>
-            <label className="grid gap-2">
-              <span className="label">Default GitHub Branch</span>
-              <input className="input" value={collaborationBoard.githubBranch} onChange={(event) => updateBoard({ githubBranch: event.target.value })} />
-            </label>
-            <label className="grid gap-2">
-              <span className="label">Handoff Note</span>
-              <textarea className="textarea" value={collaborationBoard.handoffNote} onChange={(event) => updateBoard({ handoffNote: event.target.value })} />
-            </label>
-            <label className="grid gap-2">
-              <span className="label">Review Focus</span>
-              <textarea className="textarea" value={collaborationBoard.reviewFocus} onChange={(event) => updateBoard({ reviewFocus: event.target.value })} />
-            </label>
-          </div>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        <Panel title="Shared Team Tasks">
+          {activeTasks.length === 0 ? (
+            <div className="rounded-md border border-dashed border-slate-200 p-5 text-sm text-slate-500">
+              {shared.loading ? "Loading shared tasks..." : "No active shared tasks."}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activeTasks.map((task) => (
+                <SharedTaskCard
+                  key={task.id}
+                  task={task}
+                  actor={shared.actor}
+                  pending={shared.pendingKeys.has(task.id)}
+                  onCompletion={shared.setCompletion}
+                  onEdit={shared.editTask}
+                />
+              ))}
+            </div>
+          )}
         </Panel>
 
-        <Panel title="GitHub Safe Workflow">
-          <div className="space-y-3">
-            {["Pull main before changing files", "Use one feature branch per focused change", "Run checks before review", "Merge only after both people understand the change"].map(
-              (step, index) => (
-                <div key={step} className="flex items-start gap-3 rounded-lg border border-slate-200 bg-white p-4">
-                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-50 text-sm font-bold text-brand-700">{index + 1}</div>
-                  <p className="text-sm font-semibold leading-6 text-slate-700">{step}</p>
+        <Panel
+          title="Shared Activity"
+          actions={
+            <button aria-label="Refresh activity" className="icon-button hover:border-brand-200 hover:bg-brand-50 hover:text-brand-700 focus:ring-brand-100" title="Refresh activity" onClick={shared.refresh}>
+              <RefreshCw aria-hidden="true" className="h-4 w-4" />
+            </button>
+          }
+        >
+          {shared.activity.length === 0 ? (
+            <div className="rounded-md border border-dashed border-slate-200 p-5 text-sm text-slate-500">No shared activity yet.</div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {shared.activity.slice(0, 20).map((item) => (
+                <div key={item.id} className="py-3">
+                  <p className="text-sm text-slate-700">
+                    <span className="font-bold text-slate-950">{actorLabel(item.actor)}</span> {item.action}: {item.targetTitle}
+                  </p>
+                  <time className="mt-1 block text-xs font-semibold text-slate-500">{activityTime(item.timestamp)}</time>
                 </div>
-              )
-            )}
-          </div>
-          <div className="mt-5 rounded-lg border border-emerald-100 bg-emerald-50 p-4">
-            <div className="flex items-center gap-2 text-sm font-bold text-emerald-700">
-              <GitBranch aria-hidden="true" className="h-4 w-4" />
-              Current branch pattern
+              ))}
             </div>
-            <p className="mt-2 break-words text-sm font-semibold text-slate-800">{collaborationBoard.githubBranch}</p>
-          </div>
+          )}
         </Panel>
-      </div>
-
-      <div className="mt-6 grid gap-5 xl:grid-cols-3">
-        {collaborationBoard.items.map((item) => (
-          <article key={item.id} className="surface p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-xs font-semibold uppercase text-brand-600">{item.area}</div>
-                <h2 className="mt-1 text-lg font-bold leading-6 text-slate-950">{item.title}</h2>
-              </div>
-              <Badge tone={statusTone(item.status)}>{item.status}</Badge>
-            </div>
-
-            <div className="mt-4 grid gap-3">
-              <label className="grid gap-2">
-                <span className="label">Owner</span>
-                <select className="select" value={item.owner} onChange={(event) => updateItem(item.id, { owner: event.target.value as CollaboratorName })}>
-                  {collaboratorNames.map((name) => (
-                    <option key={name} value={name}>
-                      {name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2">
-                <span className="label">Status</span>
-                <select className="select" value={item.status} onChange={(event) => updateItem(item.id, { status: event.target.value as TaskStatus })}>
-                  {taskStatuses.map((status) => (
-                    <option key={status} value={status}>
-                      {status}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2">
-                <span className="label">Review Status</span>
-                <select className="select" value={item.reviewState} onChange={(event) => updateItem(item.id, { reviewState: event.target.value as ReviewState })}>
-                  {reviewStates.map((state) => (
-                    <option key={state} value={state}>
-                      {state}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="grid gap-2">
-                <span className="label">GitHub Branch</span>
-                <input className="input" value={item.githubBranch} onChange={(event) => updateItem(item.id, { githubBranch: event.target.value })} />
-              </label>
-              <label className="grid gap-2">
-                <span className="label">Handoff</span>
-                <textarea className="textarea" value={item.handoffNote} onChange={(event) => updateItem(item.id, { handoffNote: event.target.value })} />
-              </label>
-              <label className="grid gap-2">
-                <span className="label">Check-In Note</span>
-                <textarea className="textarea" value={item.checkInNote} onChange={(event) => updateItem(item.id, { checkInNote: event.target.value })} />
-              </label>
-            </div>
-
-            <div className="mt-5">
-              <div className="mb-3 flex items-center gap-2 text-sm font-bold text-slate-950">
-                <MessageSquare aria-hidden="true" className="h-4 w-4" />
-                Shared Checklist
-              </div>
-              <div className="space-y-2">
-                {item.checklist.map((entry) => {
-                  const Icon = entry.done ? CheckCircle2 : Circle;
-
-                  return (
-                    <label key={entry.id} className="flex min-h-10 items-center gap-3 rounded-md border border-slate-200 bg-white px-3 text-sm">
-                      <input className="sr-only" type="checkbox" checked={entry.done} onChange={() => toggleChecklist(item.id, entry.id)} />
-                      <Icon aria-hidden="true" className={`h-5 w-5 ${entry.done ? "text-emerald-600" : "text-slate-400"}`} />
-                      <span className={entry.done ? "text-slate-500 line-through" : "text-slate-700"}>{entry.label}</span>
-                    </label>
-                  );
-                })}
-              </div>
-            </div>
-          </article>
-        ))}
       </div>
     </Layout>
   );

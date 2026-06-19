@@ -77,3 +77,21 @@ Reason: The project now has a working production deployment, so future changes s
 Decision: Build V3.5 Collaborator Mode as local storage planning data with fixed collaboration work items, owner fields, review states, branch notes, handoff notes, check-in notes, and checklists.
 
 Reason: Tishon and Mia need a simple shared workflow for deciding who does what next. Real accounts, live sync, permissions, and GitHub automation would add complexity before the project needs it.
+
+## 2026-06-19: Move Team Tasks To Shared Redis Storage
+
+Decision: Replace the V3.5 local collaborator board and local task source with one Upstash Redis-backed team task system. Keep Redis access inside Next.js API routes and derive task status server-side from independent Tishon and Mia completion values.
+
+Reason: Tishon and Mia now need task creation, edits, completion, and activity to stay consistent across separate browsers. A small Redis service provides measurable collaboration value without adding accounts, roles, or a complex database.
+
+## 2026-06-19: Preserve The Actual 66-Day Repository Schedule
+
+Decision: Bootstrap all 66 current V3 schedule tasks even though the V4 prompt mentions 56 days.
+
+Reason: The verified repository source, status documents, and previous schedule requirement all define 66 ordered days from June 21 through August 25. Removing ten tasks would be destructive and conflict with the active source of truth.
+
+## 2026-06-19: Keep Attribution Trust-Based
+
+Decision: Keep a device-local `Updating as` selector and send the selected collaborator with each mutation. Do not add authentication or task ownership.
+
+Reason: The requested V4 scope needs visible attribution, not identities or permissions. The resulting public-write risk is documented for future hardening.

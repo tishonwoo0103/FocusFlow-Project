@@ -34,15 +34,15 @@ For feature-specific context, also read the matching file under `docs/` and insp
 
 ## Current Product
 
-- Version: FocusFlow V3.5
+- Version: FocusFlow V4
 - Framework: Next.js 14 Pages Router
 - Language: TypeScript
 - Styling: Tailwind CSS
 - Icons: Lucide React
-- Persistence: browser local storage
+- Persistence: Upstash Redis for shared tasks/activity; browser local storage for other planning workspaces
 - Schedule: 66 daily tasks from 2026-06-21 through 2026-08-25
-- Collaboration: local-only Collaborator Mode for Tishon and Mia
-- Deployment: GitHub `main` to Vercel
+- Collaboration: shared team tasks for Tishon and Mia with trust-based attribution
+- Deployment: GitHub `dev` to Vercel Preview; `main` to production only after approval
 
 Do not add authentication, a backend, a database, cloud synchronization, AI integrations, permissions, or automated GitHub writes unless the user explicitly requests them and the value clearly justifies the added complexity.
 
@@ -55,10 +55,13 @@ Follow the existing repository structure:
 - `src/types/index.ts`: shared data types and allowed values
 - `src/lib/summerSchedule.ts`: source of truth for the eight-stage, 66-day schedule
 - `src/lib/initialData.ts`: default application data
-- `src/lib/operatingSystem.ts`: shared local application state
+- `src/lib/operatingSystem.ts`: local state for non-task planning workspaces
 - `src/lib/storage.ts`: local storage behavior
 - `src/lib/normalizers.ts`: defensive migration and saved-data normalization
 - `src/lib/selectors.ts`: derived task and schedule data
+- `src/lib/sharedTasksServer.ts`: validated shared task service and Redis mutations
+- `src/hooks/useSharedTasks.ts`: client synchronization and mutation interface
+- `src/pages/api/shared/`: server-only shared task API routes
 - `src/styles/globals.css`: shared visual styles
 
 Prefer existing components, CSS classes, data shapes, and state patterns. Add a new abstraction only when it removes real complexity or clearly matches an established pattern.
@@ -75,8 +78,10 @@ Prefer existing components, CSS classes, data shapes, and state patterns. Add a 
 - Wix Learning remains a guided five-stage curriculum.
 - Research remains a six-domain evidence library.
 - Website Planning remains split into Vibe Coding and Wix Development.
-- Collaborator Mode remains local-only and uses owner, review state, branch, handoff, check-in, and checklist fields.
-- Older supported local storage data migrates safely to `focusflow:v8:*` data.
+- Every task is shared and shows independent Tishon and Mia completion values.
+- Task status is derived server-side: neither checked is Next Up, one checked is In Progress, both checked is Completed.
+- Tasks and activity do not silently fall back to local storage.
+- Older supported local task data imports once into `focusflow:shared:v1:*` Redis data.
 
 Do not restore retired meeting-management, task-ranking, or stalled-work systems unless the user explicitly changes the product direction.
 
@@ -99,7 +104,7 @@ Work with the current Git tree. Never discard unrelated edits, and never rewrite
 - Prefer readable code over clever code.
 - Use descriptive names and short comments only where logic is not self-explanatory.
 - Use TypeScript types instead of unstructured objects.
-- Normalize data read from local storage before rendering it.
+- Normalize data read from local storage before rendering it or importing it into shared storage.
 - Provide safe defaults for optional or older saved fields.
 - Preserve task completion by stable identifier when migrating data.
 - Avoid silently deleting browser data.
@@ -128,7 +133,7 @@ npm run typecheck
 npm run build
 ```
 
-Then verify the affected route and nearby workflows in a browser. For major changes, check:
+Then verify the affected route and nearby workflows in the Vercel `dev` preview. For major changes, check:
 
 - `/`
 - `/today`
@@ -161,12 +166,13 @@ Keep status documents factual. Do not mark work complete until implementation an
 ## Git And Deployment Safety
 
 - Inspect `git status` before and after editing.
-- Use focused feature branches for substantial work.
+- Work on `dev` unless the user explicitly requests another branch.
 - Keep commits small and clearly named.
 - Run verification before merging or pushing.
 - Do not force push.
 - Do not delete files unless they are clearly unused and the deletion is part of the request.
 - Do not commit `.env*`, `.next/`, `node_modules/`, or `.vercel/` files.
+- Push only `origin/dev` after explicit approval. Never merge `dev` into `main` automatically.
 - Do not run remote Git or Vercel actions unless the user has requested or confirmed them.
 
 Follow `RECOVERY_GUIDE.md` when a page breaks or a change needs to be restored.
@@ -189,6 +195,7 @@ The current project tasks are:
 
 - Add real Wix learning resource links.
 - Add real research sources and evidence summaries.
-- Use Collaborator Mode to assign Mia's next focused item.
+- Configure Upstash Redis for the Vercel `dev` preview.
+- Verify shared task synchronization in normal and private browser windows.
 - Start the June 21 Blueprint schedule.
 - Keep `main` deployable through small branches and verified merges.

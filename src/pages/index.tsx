@@ -1,11 +1,12 @@
-import Link from "next/link";
-import { ArrowDown, ArrowRight, Crosshair, GitBranch, Target, Users } from "lucide-react";
+import { ArrowDown, ArrowRight, Crosshair, Target } from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { Layout } from "@/components/Layout";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel } from "@/components/Panel";
 import { ProgressBar } from "@/components/ProgressBar";
+import { SharedStorageState } from "@/components/SharedStorageState";
 import { TaskList } from "@/components/TaskList";
+import { useSharedTasks } from "@/hooks/useSharedTasks";
 import { formatShortDate } from "@/lib/format";
 import { useOperatingSystemState } from "@/lib/operatingSystem";
 import { getActiveBuildStage, getSummerTaskProgress, getUpcomingTasks, groupTasksByDate } from "@/lib/selectors";
@@ -89,58 +90,41 @@ function RoadmapTimeline({
 }
 
 export default function DashboardPage() {
-  const { collaborationBoard, projectStatus, setProjectStatus, tasks, setTasks } = useOperatingSystemState();
+  const { projectStatus, setProjectStatus } = useOperatingSystemState();
+  const shared = useSharedTasks();
   const activeStage = getActiveBuildStage();
-  const progress = getSummerTaskProgress(tasks);
-  const upcomingTaskGroups = groupTasksByDate(getUpcomingTasks(tasks));
-  const miaItems = collaborationBoard.items.filter((item) => item.owner === "Mia" || item.owner === "Both");
-  const activeMiaItems = miaItems.filter((item) => item.status !== "Completed");
+  const progress = getSummerTaskProgress(shared.tasks);
+  const upcomingTaskGroups = groupTasksByDate(getUpcomingTasks(shared.tasks));
+
+  const activityLabel = (value: string) => value.charAt(0).toUpperCase() + value.slice(1);
+  const actorLabel = (value: string) => value === "tishon" ? "Tishon" : "Mia";
+  const activityTime = (value: string) => {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "Unknown time" : new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(date);
+  };
 
   return (
     <Layout title="Dashboard">
       <PageHeader title="Dashboard" eyebrow="FocusFlow" />
 
-      <RoadmapTimeline
-        activeStageNumber={activeStage.stageNumber}
-        progressPercentage={progress.percentage}
-        completedTasks={progress.completedTasks}
-        totalTasks={progress.totalTasks}
+      <SharedStorageState
+        actor={shared.actor}
+        setActor={shared.setActor}
+        error={shared.error}
+        needsBootstrap={shared.needsBootstrap}
+        pendingKeys={shared.pendingKeys}
+        retry={shared.refresh}
+        bootstrap={shared.bootstrap}
       />
 
-      <section className="surface mt-6 p-5">
-        <div className="grid gap-5 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <div className="flex items-center gap-2 text-sm font-semibold text-brand-700">
-              <Users aria-hidden="true" className="h-4 w-4" />
-              Collaborator Mode
-            </div>
-            <h2 className="mt-2 text-xl font-bold text-slate-950">Tishon + Mia build lane</h2>
-            <p className="mt-2 text-sm leading-6 text-slate-600">{collaborationBoard.sharedGoal}</p>
-          </div>
-          <div className="grid gap-3 md:grid-cols-3">
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="label">Mia Active Items</div>
-              <div className="mt-2 text-2xl font-bold text-slate-950">{activeMiaItems.length}</div>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="label">Next Check-In</div>
-              <p className="mt-2 text-sm font-semibold leading-6 text-slate-800">{collaborationBoard.nextCheckIn}</p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-              <div className="flex items-center gap-2 text-xs font-semibold text-slate-600">
-                <GitBranch aria-hidden="true" className="h-4 w-4" />
-                Branch
-              </div>
-              <p className="mt-2 break-words text-sm font-semibold leading-6 text-slate-800">{collaborationBoard.githubBranch}</p>
-            </div>
-          </div>
-        </div>
-        <div className="mt-4">
-          <Link href="/collaborator" className="btn-secondary">
-            Open Collaborator Mode
-          </Link>
-        </div>
-      </section>
+      <div className="mt-6">
+        <RoadmapTimeline
+          activeStageNumber={activeStage.stageNumber}
+          progressPercentage={progress.percentage}
+          completedTasks={progress.completedTasks}
+          totalTasks={progress.totalTasks}
+        />
+      </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <Panel title="Current Build State">
@@ -208,11 +192,33 @@ export default function DashboardPage() {
                   <TaskList
                     tasks={group.tasks}
                     emptyLabel="No tasks for this date."
-                    onStatusChange={(taskId, status) =>
-                      setTasks((current) => current.map((task) => (task.id === taskId ? { ...task, status } : task)))
-                    }
+                    actor={shared.actor}
+                    pendingKeys={shared.pendingKeys}
+                    onCompletion={shared.setCompletion}
+                    onEdit={shared.editTask}
                   />
                 </section>
+              ))}
+            </div>
+          )}
+        </Panel>
+      </div>
+
+      <div className="mt-6">
+        <Panel title="Shared Activity">
+          {shared.activity.length === 0 ? (
+            <div className="rounded-md border border-dashed border-slate-200 p-5 text-sm text-slate-500">
+              {shared.loading ? "Loading shared activity..." : "No shared activity yet."}
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {shared.activity.slice(0, 12).map((item) => (
+                <div key={item.id} className="flex flex-col gap-1 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-sm text-slate-700">
+                    <span className="font-bold text-slate-950">{actorLabel(item.actor)}</span> {activityLabel(item.action)}: {item.targetTitle}
+                  </p>
+                  <time className="text-xs font-semibold text-slate-500">{activityTime(item.timestamp)}</time>
+                </div>
               ))}
             </div>
           )}

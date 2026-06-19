@@ -31,4 +31,4 @@ A feature is complete when:
 
 # Design Note
 
-V3.5 Collaborator Mode should stay local, calm, and action-oriented. Use the existing surfaces, panels, badges, selects, textareas, and checklist patterns before adding new UI patterns. Do not turn collaborator work into authentication, permissions, live sync, or GitHub automation unless a future requirement explicitly asks for that complexity.
+V4 Collaborator Mode uses the existing calm, action-oriented surfaces and controls. All tasks are shared, with two completion signals and trust-based update attribution. Do not add task ownership, personal lists, authentication, permissions, or GitHub automation unless a future requirement explicitly changes the scope.

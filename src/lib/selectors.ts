@@ -23,20 +23,20 @@ const daysUntil = (value: string) => {
   return Math.ceil((target - today) / 86_400_000);
 };
 
-export const getOpenTasks = (tasks: Task[]) => {
+export const getOpenTasks = <T extends Task>(tasks: T[]) => {
   return tasks.filter((task) => task.status !== "Completed");
 };
 
-export const sortTasksByDate = (tasks: Task[]) => {
+export const sortTasksByDate = <T extends Task>(tasks: T[]) => {
   return [...tasks].sort((a, b) => parseDate(a.dueDate) - parseDate(b.dueDate));
 };
 
-export const getTodaysTasks = (tasks: Task[]) => {
+export const getTodaysTasks = <T extends Task>(tasks: T[]) => {
   const today = todayIso();
   return sortTasksByDate(tasks.filter((task) => task.dueDate === today));
 };
 
-export const getUpcomingTasks = (tasks: Task[]) => {
+export const getUpcomingTasks = <T extends Task>(tasks: T[]) => {
   return sortTasksByDate(
     getOpenTasks(tasks).filter((task) => {
       const days = daysUntil(task.dueDate);
@@ -45,7 +45,7 @@ export const getUpcomingTasks = (tasks: Task[]) => {
   );
 };
 
-export const getFutureScheduledTasks = (tasks: Task[]) => {
+export const getFutureScheduledTasks = <T extends Task>(tasks: T[]) => {
   return sortTasksByDate(
     tasks.filter((task) => {
       const days = daysUntil(task.dueDate);
@@ -54,8 +54,8 @@ export const getFutureScheduledTasks = (tasks: Task[]) => {
   );
 };
 
-export const groupTasksByDate = (tasks: Task[]) => {
-  return sortTasksByDate(tasks).reduce<Array<{ date: string; tasks: Task[] }>>((groups, task) => {
+export const groupTasksByDate = <T extends Task>(tasks: T[]) => {
+  return sortTasksByDate(tasks).reduce<Array<{ date: string; tasks: T[] }>>((groups, task) => {
     const group = groups.find((item) => item.date === task.dueDate);
 
     if (group) {

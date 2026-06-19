@@ -152,3 +152,25 @@ Current Vercel project:
 - Latest production deployment state: `READY`
 - Latest deployment URL: `https://focus-flow-project-6szvrvmee-tishonwoo0103-1084s-projects.vercel.app`
 - Local `.vercel/project.json` may link this folder to the project, but `.vercel/` stays ignored.
+
+## Shared Task Recovery
+
+If shared tasks show **Shared storage unavailable**:
+
+1. Confirm the Vercel Preview has `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
+2. Confirm both variables belong to the same Upstash database.
+3. Redeploy the `dev` preview after changing environment variables.
+4. Use **Retry** in FocusFlow.
+5. Do not add a localStorage fallback or delete Redis keys.
+
+If shared storage is uninitialized, Tishon should use **Import Local Tasks** once. A repeated import returns safely and must not overwrite newer remote data.
+
+Before changing Redis data manually, create a Git checkpoint and export or inspect the current Upstash hash and activity list. The active keys are:
+
+```text
+focusflow:shared:v1:tasks
+focusflow:shared:v1:activity
+focusflow:shared:v1:initialized
+```
+
+Because V4 has no authentication, remove public access to the deployment or add authentication before using it with untrusted users.
