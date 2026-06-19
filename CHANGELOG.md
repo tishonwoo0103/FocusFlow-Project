@@ -15,7 +15,9 @@ Implemented truly shared team tasks for Tishon and Mia on the `dev` branch.
 - Added shared-task contract tests for status derivation, migration, validation, schedule preservation, and unavailable-storage behavior.
 - Corrected Upstash response deserialization so Redis hashes return task records keyed by task ID.
 - Documented Vercel Upstash setup, environment variables, migration, and public-write security risk.
-- Kept `main` unchanged and deferred all remote pushes until user approval.
+- Pushed V4 to `dev` after user approval and kept `main` unchanged.
+- Corrected the Git commit identity used by Vercel and created a successful Preview deployment for commit `7478815`.
+- Verified all 9 application routes return HTTP 200 on Preview and confirmed the shared API fails safely until Preview Redis variables are configured.
 
 ## FocusFlow V3.5 - 2026-06-17
 

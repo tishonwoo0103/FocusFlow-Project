@@ -6,9 +6,9 @@ FocusFlow V4 Shared Collaborator Mode implementation
 
 ## Completion
 
-90%
+95%
 
-The implementation and local static checks are in progress. Vercel Preview deployment and the required two-browser synchronization test remain pending because `dev` must not be pushed before user approval.
+The implementation, local checks, `dev` push, and Vercel Preview build are complete. Shared Redis configuration and the required two-browser synchronization test remain pending.
 
 ## V4 Status
 
@@ -23,8 +23,10 @@ The implementation and local static checks are in progress. Vercel Preview deplo
 - Shared task editing and deletion: Implemented
 - Legacy local task bootstrap: Implemented
 - Failure banner, retry, and retained last data: Implemented
-- Vercel Preview verification: Pending approval to push `dev`
-- Two-browser synchronization verification: Pending preview and Upstash Preview variables
+- Vercel Preview deployment: Ready
+- Preview route audit: Passed for all 9 application routes
+- Shared API availability: Waiting for Upstash Preview variables
+- Two-browser synchronization verification: Pending Upstash Preview variables
 
 ## Architecture
 
@@ -54,24 +56,24 @@ The 66-day schedule remains the source migration baseline from 2026-06-21 throug
 - `npm run lint`: Passed
 - `npm run typecheck`: Passed
 - `npm run build`: Passed with a clean temporary npm CLI and the bundled Node runtime; all 11 pages and 4 API routes built
-- API browser verification: Pending Vercel Preview
-- Two-browser test: Pending Vercel Preview
+- Vercel Preview build: Passed for commit `7478815`
+- Preview route audit: Dashboard, Today, Calendar, Collaborator, Wix Learning, Research, Website Planning, Vibe Coding, and Wix Development all returned HTTP 200 without the error-boundary text
+- Shared API check: Correctly returned HTTP 503 with `SHARED_STORAGE_UNAVAILABLE` because Preview Redis variables are not configured
+- Two-browser test: Pending Preview Redis configuration
 - Main changed or merged: No
-- Remote push: Not performed
+- Remote push: `dev` pushed; `main` remains unchanged at `807d52a`
 
 ## Remaining Risks
 
 - Preview deployment requires `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in Vercel Preview variables.
 - With no authentication, API attribution is trust-based and public writes are possible.
 - Polling can take up to five seconds to show another browser's update.
-- Vercel Preview and two-browser behavior cannot be truthfully verified until the user approves pushing `dev`.
+- Shared mutations and cross-browser polling cannot be verified on Preview until the Redis variables are configured.
 - The ignored bundled npm extraction intermittently timed out, so final verification used a clean temporary npm CLI from the repository's cached package.
 
 ## Next Tasks
 
-- Review the completed local check suite and source audit.
-- Review the diff with the user.
-- After explicit approval, commit and push only `origin/dev`.
-- Add Upstash variables to Vercel Preview if they are not already present.
+- Add `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` to the Vercel Preview environment.
+- Redeploy `dev` after adding the variables.
 - Run the two-browser Tishon/Mia synchronization test on the generated preview.
 - Merge to `main` only after separate explicit approval.
